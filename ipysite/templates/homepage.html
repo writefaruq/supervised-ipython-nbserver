@@ -7,16 +7,27 @@
 {% block body_class %}home{% endblock %}
 
 {% block banner %}
-    <h2>{% trans "Welcome to IPython Notebook Server v1.0" %}</h2>
+    <h2>{% trans "Welcome to IPython Notebook Server v1" %}</h2>
    
    
     {% if user.is_authenticated %}
     
-    <p>{% blocktrans %}IPython Notebook Server is ready! <br />
-	Vist the <a href="/account/settings/">settings page</a> to grab the server password and run it.
-        {% endblocktrans %}
-    </p>
-    
+        {% if user.is_staff   %}
+        
+        <p>{% blocktrans %}IPython Notebook Server is ready! <br />
+    	Vist the <a href="/account/settings/">settings page</a> to grab the server password and run it.
+            {% endblocktrans %}
+        </p>
+        
+        {% else %}
+        <p>
+            If you are authorized to access the Notebook server, visit the <a href="/account/settings/">settings page</a>.  <br >
+            
+            If you are not authorized yet, please contact your course administrator for help.
+        </p>
+        
+        {% endif %}
+        
     {% else %}
         {% url account_login as login_url %}
         {% url account_signup as signup_url %}

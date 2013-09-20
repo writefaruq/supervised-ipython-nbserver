@@ -12,9 +12,9 @@ class UserProfile(models.Model):
     user = models.OneToOneField(User)
     
     # Other fields here
-    nbserver_port = models.IntegerField(unique=True, default=0)
-    nbserver_pid = models.IntegerField(unique=True, default=0)
-    nbserver_password = models.CharField(max_length=16, null=True)
+    nbserver_port = models.IntegerField("Notebook server port", unique=True, default=0)
+    nbserver_password = models.CharField("Notebook server password", max_length=16, null=True)
+    access_enabled = models.BooleanField("Can access Notebook server", default=False)
 
 
 

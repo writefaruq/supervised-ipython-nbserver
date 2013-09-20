@@ -137,18 +137,18 @@ INSTALLED_APPS = [
     
     "debug_toolbar",
     
-    # theme
+    ## theme
     "pinax_theme_bootstrap",
     "django_forms_bootstrap",
     
-    # external
+    ## external
     "account",
     "metron",
     "eventlog",
     #"south",
     "clippy",
     
-    # project
+    ## project
     "ipysite",
     
 ]
