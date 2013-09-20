@@ -1,0 +1,25 @@
+{% extends "banner_base.html" %}
+
+{% load i18n %}
+
+{% block head_title %}{% trans "Welcome" %}{% endblock %}
+
+{% block body_class %}home{% endblock %}
+
+{% block banner %}
+    <h2>{% trans "Welcome to IPython Notebook Server v1.0" %}</h2>
+   
+   
+    {% if user.is_authenticated %}
+    
+    <p>{% blocktrans %}IPython Notebook Server is ready! <br />
+	Vist the <a href="/account/settings/">settings page</a> to grab the server password and run it.
+        {% endblocktrans %}
+    </p>
+    
+    {% else %}
+        {% url account_login as login_url %}
+        {% url account_signup as signup_url %}
+        <p>{% blocktrans %}You can <a href="{{ login_url }}" class="btn">Log In</a>  to try out the Ipython Notebook Server.{% endblocktrans %}</p>
+    {% endif %}
+{% endblock %}
