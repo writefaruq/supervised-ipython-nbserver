@@ -3,14 +3,8 @@
 # base URL of server
 BASE_URL = 'http://ipython.local-server.org'
 
-# Root of user workspace directory tree
-DATA_DIR = '/data/ipython/user_data'
-
 
 # Notebook server port base
-NB_SERVER_PORT_BASE = 9000
+NB_SERVER_SETTINGS_FILE = '../shared_config_files/all_nbserver_config.csv'
 
-
-# Virtualenvironment executable path
-VIRTUALENV_BIN_PATH = '/home/faruq/projects/venvs/ipnb/bin/'
 
