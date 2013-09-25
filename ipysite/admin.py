@@ -1,8 +1,12 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User
+from django.db import models
+from django.forms import ModelForm
 
-from models import UserProfile
+from models import UserProfile, NoteBookServerAccessConfiguration
+
+
 
 # Define an inline admin descriptor for UserProfile model
 # which acts a bit like a singleton
@@ -39,8 +43,14 @@ class UserProfileAdmin(admin.ModelAdmin):
     disable_nbserver_access.short_description = "Disable Notebook server access for selected users"
 
 
+
+class NoteBookServerAccessConfigurationAdmin(admin.ModelAdmin):
+    list_display = ('input_file', 'used_for', 'applied_at')
     
-# Re-register UserAdmin
+
+
+# Register models
 admin.site.unregister(User)
 admin.site.register(User, UserAdmin)
 admin.site.register(UserProfile, UserProfileAdmin)
+admin.site.register(NoteBookServerAccessConfiguration, NoteBookServerAccessConfigurationAdmin)

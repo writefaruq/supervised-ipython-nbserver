@@ -25,6 +25,11 @@ class UserProfile(models.Model):
     def name(self):
         return self.user.get_full_name()
     
+    def save(self, *args, **kwargs):
+        if self.user.is_staff:
+            self.access_enabled = True
+        super(UserProfile, self).save(*args, **kwargs)
+    
 
 
 def create_user_profile(sender, instance, created, **kwargs):
@@ -34,6 +39,37 @@ def create_user_profile(sender, instance, created, **kwargs):
     post_save.connect(create_user_profile, sender=User)
 
 
-#class NotebookServerAccessControl(models.Model):
-#    user_profile =  models.OneToOneField(UserProfile)
+
+class NoteBookServerAccessConfiguration(models.Model):
+    """ Manages the Notebook server access through CSV file uploads"""
+    input_file = models.FileField(upload_to=nc.NB_SERVER_ACCESS_CONFIG_PATH)
+    ENABLE_ACCESS, DISABLE_ACCESS = 'enable_access', 'disable_access'
+    used_for = models.CharField(max_length=20, choices=((ENABLE_ACCESS, ENABLE_ACCESS), 
+                                                        (DISABLE_ACCESS, DISABLE_ACCESS)), 
+                                                        default=ENABLE_ACCESS)
+    applied_at = models.DateTimeField(auto_now_add=True)
     
+    
+    class Meta:
+        verbose_name = "Notebook Server Access Configuration"
+        verbose_name_plural = "Notebook Server Access Configuration"  
+    
+    
+    def __unicode__(self):
+        return "%s" %self.input_file
+    
+    
+    def save(self, *args, **kwargs):
+        # process the input_file
+        for line in self.input_file.__dict__['_file'].readlines():
+            line = line.strip()
+            users = User.objects.filter(username=line)
+            if users:
+                user = users[0]
+                user_profile = user.get_profile()
+                if user.is_staff or (self.used_for == self.ENABLE_ACCESS):
+                    user_profile.access_enabled = True
+                elif self.used_for == self.DISABLE_ACCESS:
+                    user_profile.access_enabled = False
+                user_profile.save()
+        super(NoteBookServerAccessConfiguration, self).save(*args, **kwargs) 
