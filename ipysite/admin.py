@@ -49,7 +49,7 @@ class UserProfileAdmin(admin.ModelAdmin):
 
 
 class NoteBookServerAccessConfigurationAdmin(admin.ModelAdmin):
-    actions = ['view_selected_file_contents']
+    actions = ['view_selected_file_contents', 'reset_access']
     list_display = ('input_file', 'used_for', 'applied_at')
     
     def __init__(self, *args, **kwargs):
@@ -64,8 +64,15 @@ class NoteBookServerAccessConfigurationAdmin(admin.ModelAdmin):
             content.append(config_file.input_file.read())
         response.content = content
         return response
-    view_selected_file_contents.short_description = "View selected file contents"    
-
+    view_selected_file_contents.short_description = "View selected file contents (shows in another window)"
+    
+    def reset_access(self, request, queryset):    
+        """ Disable all user access """
+        profiles = UserProfile.objects.all()
+        for profile in profiles:
+            profile.access_enabled = False
+            profile.save()
+    reset_access.short_description = 'Disable all user access to Notebook servers (except staff)'
 
 # Register models
 admin.site.unregister(User)
