@@ -16,17 +16,18 @@ class UserProfileInline(admin.StackedInline):
 class UserAdmin(UserAdmin):
     inlines = (UserProfileInline, )
     
+
+
+class UserProfileAdmin(admin.ModelAdmin):
+    list_display   = ('user', 'name', 'email', 'nbserver_port', 'nbserver_password', 'access_enabled' )
+    
     actions = ['enable_nbserver_access', 'disable_nbserver_access']
     
-    
     def _change_access(self, queryset, enable):
-        for obj in queryset:
-            user_profiles = UserProfile.objects.filter(user=obj)
-            if user_profiles:
-                user_profile = user_profiles[0]
+        for user_profile in queryset:
                 user_profile.access_enabled = enable
                 user_profile.save() 
-    
+                
     def enable_nbserver_access(self, request, queryset):
         """ Enable notebook server access the selected users"""
         self._change_access(queryset, enable=True)
@@ -38,6 +39,8 @@ class UserAdmin(UserAdmin):
     disable_nbserver_access.short_description = "Disable Notebook server access for selected users"
 
 
+
 # Re-register UserAdmin
 admin.site.unregister(User)
 admin.site.register(User, UserAdmin)
+admin.site.register(UserProfile, UserProfileAdmin)

@@ -16,6 +16,12 @@ class UserProfile(models.Model):
     nbserver_password = models.CharField("Notebook server password", max_length=16, null=True)
     access_enabled = models.BooleanField("Can access Notebook server", default=False)
 
+    def email(self):
+        return self.user.email
+    
+    def name(self):
+        return self.user.get_full_name()
+    
 
 
 def create_user_profile(sender, instance, created, **kwargs):
@@ -25,3 +31,6 @@ def create_user_profile(sender, instance, created, **kwargs):
     post_save.connect(create_user_profile, sender=User)
 
 
+#class NotebookServerAccessControl(models.Model):
+#    user_profile =  models.OneToOneField(UserProfile)
+    
