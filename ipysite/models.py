@@ -30,6 +30,9 @@ class UserProfile(models.Model):
             self.access_enabled = True
         super(UserProfile, self).save(*args, **kwargs)
     
+    class Meta:
+        verbose_name = "Notebook Server User Setting"
+    
 
 
 def create_user_profile(sender, instance, created, **kwargs):
@@ -43,16 +46,16 @@ def create_user_profile(sender, instance, created, **kwargs):
 class NoteBookServerAccessConfiguration(models.Model):
     """ Manages the Notebook server access through CSV file uploads"""
     input_file = models.FileField(upload_to=nc.NB_SERVER_ACCESS_CONFIG_PATH)
-    ENABLE_ACCESS, DISABLE_ACCESS = 'enable_access', 'disable_access'
-    used_for = models.CharField(max_length=20, choices=((ENABLE_ACCESS, ENABLE_ACCESS), 
+    ENABLE_ACCESS, DISABLE_ACCESS = 'Enable access', 'Disable access'
+    used_for = models.CharField("Used to", max_length=20, choices=((ENABLE_ACCESS, ENABLE_ACCESS), 
                                                         (DISABLE_ACCESS, DISABLE_ACCESS)), 
                                                         default=ENABLE_ACCESS)
     applied_at = models.DateTimeField(auto_now_add=True)
     
     
     class Meta:
-        verbose_name = "Notebook Server Access Configuration"
-        verbose_name_plural = "Notebook Server Access Configuration"  
+        verbose_name = "Notebook Server Access Configuration File"
+        verbose_name_plural = "Notebook Server Access Configuration Files"  
     
     
     def __unicode__(self):

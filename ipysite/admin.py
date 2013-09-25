@@ -1,11 +1,13 @@
+import os
+
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User
 from django.db import models
 from django.forms import ModelForm
+from django.http import HttpResponse
 
 from models import UserProfile, NoteBookServerAccessConfiguration
-
 
 
 # Define an inline admin descriptor for UserProfile model
@@ -20,12 +22,14 @@ class UserProfileInline(admin.StackedInline):
 class UserAdmin(UserAdmin):
     inlines = (UserProfileInline, )
     
+    
 
 
 class UserProfileAdmin(admin.ModelAdmin):
     list_display   = ('username', 'name', 'email', 'nbserver_port', 'nbserver_password', 'access_enabled' )
     
     actions = ['enable_nbserver_access', 'disable_nbserver_access']
+
     
     def _change_access(self, queryset, enable):
         for user_profile in queryset:
@@ -45,8 +49,22 @@ class UserProfileAdmin(admin.ModelAdmin):
 
 
 class NoteBookServerAccessConfigurationAdmin(admin.ModelAdmin):
+    actions = ['view_selected_file_contents']
     list_display = ('input_file', 'used_for', 'applied_at')
     
+    def __init__(self, *args, **kwargs):
+        super(NoteBookServerAccessConfigurationAdmin, self).__init__(*args, **kwargs)
+        self.list_display_links = (None, )
+    
+    def view_selected_file_contents(self, request, queryset):
+        """ Shows the contents of the Config files"""
+        response = HttpResponse()
+        content = []
+        for config_file in queryset:
+            content.append(config_file.input_file.read())
+        response.content = content
+        return response
+    view_selected_file_contents.short_description = "View selected file contents"    
 
 
 # Register models
