@@ -16,6 +16,9 @@ class UserProfile(models.Model):
     nbserver_password = models.CharField("Notebook server password", max_length=16, null=True)
     access_enabled = models.BooleanField("Can access Notebook server", default=False)
 
+    def username(self):
+        return self.user.username
+    
     def email(self):
         return self.user.email
     

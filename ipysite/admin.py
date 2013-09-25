@@ -19,7 +19,7 @@ class UserAdmin(UserAdmin):
 
 
 class UserProfileAdmin(admin.ModelAdmin):
-    list_display   = ('user', 'name', 'email', 'nbserver_port', 'nbserver_password', 'access_enabled' )
+    list_display   = ('username', 'name', 'email', 'nbserver_port', 'nbserver_password', 'access_enabled' )
     
     actions = ['enable_nbserver_access', 'disable_nbserver_access']
     
@@ -39,7 +39,7 @@ class UserProfileAdmin(admin.ModelAdmin):
     disable_nbserver_access.short_description = "Disable Notebook server access for selected users"
 
 
-
+    
 # Re-register UserAdmin
 admin.site.unregister(User)
 admin.site.register(User, UserAdmin)
