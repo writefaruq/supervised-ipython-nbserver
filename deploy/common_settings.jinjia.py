@@ -21,11 +21,11 @@ USER_DATA_DIR = '{{ user_data_dir }}'
 
 SUPERVISORD_CONF_DIR = '{{ supervisord_config_dir }}'
 ALL_NBSERVER_CONFIG_FILE = '{{ all_nbserver_config_file }}'
+SUPERVISORD_INI_FILE_TEMPLATE = {{ 'nbserver_ini_file_template' }}
 
 # The following entries usually won't need any change
 USER_PASSWORD_LENGTH = 16
 NBSERVER_NAME_FORMAT = 'notebook-server-%d'
-SUPERVISORD_INI_FILE_TEMPLATE = 'nbserver_ini_file_template.ini'
 NBSERVER_CMD_TEMPATE = "%s/python %s/ipython notebook  --NotebookApp.ipython_dir=%s  --NotebookApp.open_browser=False --NotebookApp.ip=%s --NotebookApp.password=%s --NotebookApp.port=%s --IPKernelApp.pylab=inline --NotebookApp.enable_mathjax=True"
 
 # config file entries

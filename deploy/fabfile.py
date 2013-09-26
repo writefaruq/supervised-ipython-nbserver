@@ -88,7 +88,8 @@ def setup_notebook_configs():
                     "initial_data_dir": os.path.join(env.site_root_path, INITIAL_DATA_DIR),
                     "user_data_dir": os.path.join(env.site_root_path, USER_DATA_DIR),
                     "supervisord_config_dir": os.path.join(env.site_root_path, SUPERVISORD_DIR),
-                    "all_nbserver_config_file": os.path.join(env.site_root_path, SHARED_CONFIG_DIR, SHARED_CONFIG_FILE)}
+                    "all_nbserver_config_file": os.path.join(env.site_root_path, SHARED_CONFIG_DIR, SHARED_CONFIG_FILE),
+                    "nbserver_ini_file_template": os.path.join(env.app_path, 'utils', 'nbserver_ini_file_template.ini') }
     output_from_parsed_template = template.render(template_vars)
     #print output_from_parsed_template
      
