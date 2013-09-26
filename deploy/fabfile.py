@@ -55,7 +55,8 @@ def setup_packages():
             run("git clone %s" %(env.repo_url)) 
 
     with virtualenv():
-        run("easy_install -U distribute")
+        #run("easy_install -U distribute")
+        run("pip install numpy==1.7.1")  # fixes pip issue 
         run("pip install -r {0}/requirements.txt".format(env.app_path))  # install packages
     
 def setup_notebook_configs():
