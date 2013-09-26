@@ -4,6 +4,7 @@ Holds the commons settings between django application ipysite and supervisord
 import time
 
 NOW = time.strftime("%Y%m%d%H%M", time.gmtime())
+HOSTNAME = 'localhost'
 
 # The following needs tweaking and setup
 ALL_NBSERVER_CONFIG_FILE = '../shared_config_files/all_nbserver_config_%s.csv' %NOW # Holds all nbserver configs, shared between supervisord and django application
@@ -23,7 +24,7 @@ SUPERVISORD_CONF_DIR = '../supervisord_config_files/conf.d'
 USER_PASSWORD_LENGTH = 16
 NBSERVER_NAME_FORMAT = 'notebook-server-%d'
 SUPERVISORD_INI_FILE_TEMPLATE = 'nbserver_ini_file_template.ini'
-NBSERVER_CMD_TEMPATE = "%s/python %s/ipython notebook  --NotebookApp.ipython_dir=%s  --NotebookApp.open_browser=False --NotebookApp.ip=ipython-dev.ucl.ac.uk --NotebookApp.password=%s --NotebookApp.port=%s --IPKernelApp.pylab=inline --NotebookApp.enable_mathjax=True"
+NBSERVER_CMD_TEMPATE = "%s/python %s/ipython notebook  --NotebookApp.ipython_dir=%s  --NotebookApp.open_browser=False --NotebookApp.ip=%s --NotebookApp.password=%s --NotebookApp.port=%s --IPKernelApp.pylab=inline --NotebookApp.enable_mathjax=True"
 
 # config file entries
 NBSERVER_ALL_CONFIG_ID_COLUMN = 0

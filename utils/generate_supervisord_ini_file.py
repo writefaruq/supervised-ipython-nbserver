@@ -27,7 +27,7 @@ def generate_ini_file(server_id, server_name, ipython_dir, nbserver_port, nbserv
         nbserver_config.set(section_name, item[0], item[1])    
         
     # update the template values
-    command = nbserver_command_template  %(virtualenv_bin_path, virtualenv_bin_path, ipython_dir, nbserver_sha1, nbserver_port)
+    command = nbserver_command_template  %(virtualenv_bin_path, virtualenv_bin_path, ipython_dir, cs.HOSTNAME, nbserver_sha1, nbserver_port)
     nbserver_config.set(section_name, 'command', command)
     nbserver_config.set(section_name, 'process_name', server_name)
     nbserver_config.set(section_name, 'directory', virtualenv_bin_path)
