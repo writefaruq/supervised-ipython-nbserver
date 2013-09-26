@@ -20,14 +20,14 @@ def generate_entry(server_id, server_port_base, server_name_format=cs.NBSERVER_N
     sha1 = passwd(txt_password)
     server_name =  server_name_format %server_id
     ipython_dir = os.path.join(USER_DATA_DIR, server_name)
-    entry = [server_id, server_name, ipython_dir, server_port_base + server_id, sha1, txt_password]
+    entry = [server_id, server_name, ipython_dir, int(server_port_base) + server_id, sha1, txt_password]
     return entry
 
 def generate_config(out_file, nbserver_id_start, nbserver_id_end, nbserver_port_base):
     """ Generate CSV file containing all Notebook Server config settings"""
     config_outfile = open(out_file, 'wb')
     csv_writer = csv.writer(config_outfile)    
-    for server_id in xrange(nbserver_id_start, nbserver_id_end + 1):
+    for server_id in xrange(int(nbserver_id_start), int(nbserver_id_end) + 1):
         row = generate_entry(server_id, nbserver_port_base)
         csv_writer.writerow(row)
     print "Generated all Notebook Server config settings in %s" %out_file
