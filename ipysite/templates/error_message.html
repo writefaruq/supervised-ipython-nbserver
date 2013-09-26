@@ -1,0 +1,28 @@
+{% extends "banner_base.html" %}
+
+{% load i18n %}
+
+{% block head_title %}{% trans "Welcome" %}{% endblock %}
+
+{% block body_class %}home{% endblock %}
+
+{% block banner %}
+    <h2>{% trans "Oops! Unauthorized access is not allowed." %}</h2>
+   
+   
+    {% if user.is_authenticated %}
+    
+       
+        <p> 
+            You are not authorized yet to access the Notebook server, please contact your course administrator for help. <br >
+            When you are authorized, you can access the Notebook server from this page.  
+        </p>
+        
+       
+        
+    {% else %}
+        {% url account_login as login_url %}
+        {% url account_signup as signup_url %}
+        <p>{% blocktrans %}You need to <a href="{{ login_url }}" class="btn">Log In</a>  to try out the Ipython Notebook Server.{% endblocktrans %}</p>
+    {% endif %}
+{% endblock %}

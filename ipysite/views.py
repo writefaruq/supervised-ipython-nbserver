@@ -20,14 +20,12 @@ from utils import common_settings as cs
 
 def homepage(request):
     """ Shows homepage """
-    return render_to_response('homepage.html', 
-                              {},
-                               context_instance=RequestContext(request))
+    return render_to_response('homepage.html', {}, context_instance=RequestContext(request))
 
 
 def _get_nbserver_settings(user_id, config_file):
     #read setings from a shared settings file
-    port, password = 9999, 'Unset'
+    port, password = None, 'Unset'
     config = open(config_file, 'r')
     reader = csv.reader(config)
     for row in reader:
@@ -36,6 +34,8 @@ def _get_nbserver_settings(user_id, config_file):
             port = row[cs.NBSERVER_ALL_CONFIG_PORT_COLUMN]
             password =  row[cs.NBSERVER_ALL_CONFIG_PASSWORD_COLUMN]
             break
+    if port is None:
+        raise Exception("Failed to find a matching port number for user_id: %s in config file: %s" %(user_id, config_file))
     return (port, password)
     
 
@@ -53,23 +53,21 @@ def account_settings(request):
         user_profile = UserProfile.objects.create(user=u)
     
     # check the port setup
-    port = user_profile.nbserver_port
-    if port == 0:
-        user_id = user_profile.user.id
-        config_file =  nc.NB_SERVER_SETTINGS_FILE
-        nbserver_settings = _get_nbserver_settings(user_id, config_file)
-        #print "USER:%s --> settings: %s" %(user_id, nbserver_settings)
-        if nbserver_settings:
-            user_profile.nbserver_port = nbserver_settings[0]
-            user_profile.nbserver_password =  nbserver_settings[1]
-            user_profile.save()
+    user_id = user_profile.user.id
+    config_file =  nc.NB_SERVER_SETTINGS_FILE
+    nbserver_settings = _get_nbserver_settings(user_id, config_file)
+    #print "USER:%s --> settings: %s" %(user_id, nbserver_settings)
+    if nbserver_settings:
+        user_profile.nbserver_port = nbserver_settings[0]
+        user_profile.nbserver_password =  nbserver_settings[1]
+        user_profile.save()
     # show the settings
     if user_profile.user.is_staff or user_profile.access_enabled:
         ctx =  {'nbserver_password' : user_profile.nbserver_password,
             'nbserver_url' : '{0}:{1}'.format(nc.BASE_URL, user_profile.nbserver_port)}
         return render_to_response('account/settings.html', ctx, context_instance=RequestContext(request))
     else:
-        return HttpResponse("<html> Unauthorized access to the Notebook server is disabled . Please contact your course administrator for help.</html>")
+        return render_to_response('error_message.html', {}, context_instance=RequestContext(request))
 
 
 

@@ -22,8 +22,6 @@ class UserProfileInline(admin.StackedInline):
 class UserAdmin(UserAdmin):
     inlines = (UserProfileInline, )
     
-    
-
 
 class UserProfileAdmin(admin.ModelAdmin):
     list_display   = ('username', 'name', 'email', 'nbserver_port', 'nbserver_password', 'access_enabled' )
