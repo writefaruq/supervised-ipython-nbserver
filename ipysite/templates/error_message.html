@@ -7,15 +7,14 @@
 {% block body_class %}home{% endblock %}
 
 {% block banner %}
-    <h2>{% trans "Oops! Unauthorized access is not allowed." %}</h2>
+    <h2>{% trans "Oops!" %} {{  msg_title }} </h2>
    
    
     {% if user.is_authenticated %}
     
        
         <p> 
-            You are not authorized yet to access the Notebook server, please contact your course administrator for help. <br >
-            When you are authorized, you can access the Notebook server from this page.  
+            {{ error_details}}
         </p>
         
        
