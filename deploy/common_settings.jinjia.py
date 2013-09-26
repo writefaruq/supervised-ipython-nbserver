@@ -19,6 +19,7 @@ INITIAL_DATA_DIR = '{{ initial_data_dir }}'
 USER_DATA_DIR = '{{ user_data_dir }}'
 
 
+SUPERVISORD_ROOT_DIR = '{{ supervisord_root_dir }}'
 SUPERVISORD_CONF_DIR = '{{ supervisord_config_dir }}'
 ALL_NBSERVER_CONFIG_FILE = '{{ all_nbserver_config_file }}'
 SUPERVISORD_INI_FILE_TEMPLATE = '{{ nbserver_ini_file_template }}'
