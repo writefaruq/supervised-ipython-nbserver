@@ -23,6 +23,7 @@ SUPERVISORD_ROOT_DIR = '{{ supervisord_root_dir }}'
 SUPERVISORD_CONF_DIR = '{{ supervisord_config_dir }}'
 ALL_NBSERVER_CONFIG_FILE = '{{ all_nbserver_config_file }}'
 SUPERVISORD_INI_FILE_TEMPLATE = '{{ nbserver_ini_file_template }}'
+SUPERVISED_NBSERVER_USER = '{{ supervised_nbserver_user }}'
 
 # The following entries usually won't need any change
 USER_PASSWORD_LENGTH = 16

@@ -37,6 +37,7 @@ def generate_ini_file(server_id, server_name, ipython_dir, nbserver_port, nbserv
     nbserver_config.set(section_name, 'stderr_logfile', logfile_path)
     env_string = 'IPYTHONDIR={0}'.format(ipython_dir)
     nbserver_config.set(section_name, 'environment', env_string)
+    nbserver_config.set(section_name, 'user', cs.SUPERVISED_NBSERVER_USER)
 
     #writing config
     with open('%s/%s.ini' %(output_path, server_name), 'w') as configfile:    # save config

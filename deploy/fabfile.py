@@ -95,7 +95,8 @@ def setup_notebook_configs():
                     "supervisord_root_dir": os.path.join(env.site_root_path, SUPERVISORD_DIR),
                     "supervisord_config_dir": os.path.join(env.site_root_path, SUPERVISORD_CONF_DIR),
                     "all_nbserver_config_file": os.path.join(env.site_root_path, SHARED_CONFIG_DIR, SHARED_CONFIG_FILE),
-                    "nbserver_ini_file_template": os.path.join(env.app_path, 'utils', 'nbserver_ini_file_template.ini') }
+                    "nbserver_ini_file_template": os.path.join(env.app_path, 'utils', 'nbserver_ini_file_template.ini'),
+                    "supervised_nbserver_user" : env.user}
     output_from_parsed_template = template.render(template_vars)
     #print output_from_parsed_template
      
@@ -108,4 +109,36 @@ def setup_notebook_configs():
     # run the do-all type setup
     with virtualenv():
         run("python %s" %os.path.join(env.app_path, 'utils', 'setup_all.py'))
-            
+
+
+def setup_supervisord():
+    """ Uploads supervisord config file """
+    jinja_env = Environment(loader=FileSystemLoader(os.path.curdir))
+    template = jinja_env.get_template('supervisord.jinjia.conf')
+    template_vars = {"supervisord_server_addr": env.supervisord_server_addr, 
+                    "supervisord_admin_username": env.supervisord_admin_username, 
+                    "supervisord_admin_password": env.supervisord_admin_password,
+                    "supervisord_logfile" : os.path.join(env.site_root_path, SUPERVISORD_DIR, 'supervisord.log'),
+                    "supervisord_pidfile": os.path.join(env.site_root_path, SUPERVISORD_DIR, 'supervisord.pid'),
+                    "supervisord_user": env.user,
+                    "supervisord_ini_files": "%s/*.ini" %os.path.join(env.site_root_path, SUPERVISORD_CONF_DIR)
+                    }
+    output_from_parsed_template = template.render(template_vars)
+    #print output_from_parsed_template
+     
+    # to save the results
+    local_path = '/tmp/supervisord.conf'
+    with open(local_path, "wb") as fh:
+        fh.write(output_from_parsed_template)
+    put(local_path=local_path, remote_path=os.path.join(env.site_root_path, SUPERVISORD_DIR))
+
+def run_supervisord():
+    conf_path = os.path.join(env.site_root_path, SUPERVISORD_DIR, 'supervisord.conf')
+    with virtualenv():
+        run("supervisord -c %s" %conf_path)
+
+###  SETUP DJANGO APP ###################
+
+
+
+
