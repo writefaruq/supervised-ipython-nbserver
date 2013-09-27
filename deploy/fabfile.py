@@ -36,9 +36,31 @@ def localenv():
     env.venv_path = os.path.join(env.site_root_path, VIRTUALENV_FOLDER, REPO_NAME)
     env.app_path = os.path.join(env.site_root_path, REPO_NAME)
     # nbserver settings
+    # nbserver settings
     env.nbserver_id_start = 1
     env.nbserver_id_end = 100
-    env.nbserver_port_base = 900  
+    env.nbserver_port_base = 9000  
+    # supervisord conf settings
+    env.supervisord_server_addr = "%s:%s" %(env.hosts[0], env.nbserver_port_base) # Needs to be free
+    env.supervisord_admin_username = "sdadmin"
+    env.supervisord_admin_password = "password..."
+    # LDAP settings
+    env.ldap_host = "ldap://ldap-host"
+    env.ldap_bind_dn = "cn=moodle,ou=System Users,dc=..."
+    env.ldap_bind_password = "password..."
+    env.ldap_search_param  = "ou=departments,dc=..."
+    # app MySQL settings
+    env.mysql_user = 'root'
+    env.mysql_password = '...'
+    env.mysql_dbname = '...'
+    #apache wsgi_vhost settings
+    env.server_name = 'ipython.local-server'
+    env.server_alias = 'ipython'
+    env.apache_user = 'www-data'
+    env.apache_group = 'www-data'
+    env.apache_process_count = 2
+    env.apache_thread_count = 5
+    env.apache_restart_cmd = "sudo /etc/init.d/apache2 restart"
 
 # import local_setting by overriding above sample config
 try:
