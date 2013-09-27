@@ -32,6 +32,10 @@ def localenv():
     env.repo_url = 'https://github.com/writefaruq/%s.git' %REPO_NAME
     env.venv_path = os.path.join(env.site_root_path, VIRTUALENV_FOLDER, REPO_NAME)
     env.app_path = os.path.join(env.site_root_path, REPO_NAME)
+    # nbserver settings
+    env.nbserver_id_start = 1
+    env.nbserver_id_end = 100
+    env.nbserver_port_base = 900  
 
 # import local_setting by overriding above sample config
 try:
@@ -48,6 +52,7 @@ def virtualenv():
     with prefix("source %s/bin/activate" % env.venv_path):
         yield
 
+################# SETUP ACTIONS ##########################
 
 def setup_paths():
     if not exists(env.site_root_path):
@@ -82,9 +87,9 @@ def setup_notebook_configs():
     template = jinja_env.get_template('common_settings.jinjia.py')
     template_vars = {"host": env.hosts[0], 
                     "venv_bin_path": os.path.join(env.venv_path, 'bin'), 
-                    "nbserver_id_start": 1,
-                    "nbserver_id_end" : 100,
-                    "nbserver_port_base": 9000,
+                    "nbserver_id_start": env.nbserver_id_start,
+                    "nbserver_id_end" : env.nbserver_id_end,
+                    "nbserver_port_base": env.nbserver_post_base,
                     "initial_data_dir": os.path.join(env.site_root_path, INITIAL_DATA_DIR),
                     "user_data_dir": os.path.join(env.site_root_path, USER_DATA_DIR),
                     "supervisord_root_dir": os.path.join(env.site_root_path, SUPERVISORD_DIR),
@@ -95,7 +100,6 @@ def setup_notebook_configs():
     #print output_from_parsed_template
      
     # to save the results
-    
     local_path = '/tmp/common_settings.py'
     with open(local_path, "wb") as fh:
         fh.write(output_from_parsed_template)
@@ -105,7 +109,3 @@ def setup_notebook_configs():
     with virtualenv():
         run("python %s" %os.path.join(env.app_path, 'utils', 'setup_all.py'))
             
-
-
-     
-
