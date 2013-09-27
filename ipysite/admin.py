@@ -24,7 +24,7 @@ class UserAdmin(UserAdmin):
     
 
 class UserProfileAdmin(admin.ModelAdmin):
-    list_display   = ('username', 'fisrt_name', 'last_name', 'email', 'nbserver_port', 'nbserver_password', 'access_enabled' )
+    list_display   = ('username', 'first_name', 'last_name', 'email', 'nbserver_port', 'nbserver_password', 'access_enabled' )
     
     actions = ['enable_nbserver_access', 'disable_nbserver_access']
 
