@@ -42,3 +42,5 @@ DATABASES = {
         },
     }
 }
+
+DEBUG = {{ debug }}

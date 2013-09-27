@@ -155,7 +155,8 @@ def setup_app_config():
                     "ldap_search_param" : env.ldap_search_param,
                     "mysql_user": env.mysql_user,
                     "mysql_dbname": env.mysql_dbname,
-                    "mysql_password": env.mysql_password
+                    "mysql_password": env.mysql_password,
+                    "debug": env.debug
                     }
     output_from_parsed_template = template.render(template_vars)
     local_path = '/tmp/local_settings.py'
@@ -182,9 +183,6 @@ def setup_app():
         run("python %s/manage.py syncdb" %env.app_path)
 
 
-
-    
-
 def setup_apache_config():
     ## upload Apache vhost config
     template_dir = os.path.join(os.path.curdir, 'templates')
@@ -198,9 +196,9 @@ def setup_apache_config():
                     "apache_thread_count": env.apache_thread_count,
                     }
     if env.os == 'Debian':
-        template = jinja_env.get_template('wsgi_vhost_debian.jinja.py')
+        template = jinja_env.get_template('wsgi_vhost_debian.jinja.conf')
     elif env.os == 'Redhat':
-        template = jinja_env.get_template('wsgi_vhost_redhat.jinja.py')
+        template = jinja_env.get_template('wsgi_vhost_redhat.jinja.conf')
         
     output_from_parsed_template = template.render(template_vars)
     local_path = '/tmp/wsgi_vhsot.conf'
@@ -213,3 +211,5 @@ def setup_apache_config():
         put(local_path=local_path, remote_path='/etc/httpd/conf.d')
     
 
+def restart_apache():
+    sudo("%s restart" %env.apache_restart_cmd)
