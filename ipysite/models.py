@@ -22,8 +22,11 @@ class UserProfile(models.Model):
     def email(self):
         return self.user.email
     
-    def name(self):
-        return self.user.get_full_name()
+    def first_name(self):
+        return self.user.first_name
+    
+    def last_name(self):
+        return self.user.last_name
     
     def save(self, *args, **kwargs):
         if self.user.is_staff:

@@ -9,6 +9,9 @@ from fabric.contrib.files import exists, contains, upload_template
 from contextlib import contextmanager
 from jinja2 import Environment, FileSystemLoader
 
+# external utils functions
+from db_utils import *
+
 
 # Relateive paths
 VIRTUALENV_FOLDER = 'virtualenvs'
@@ -83,8 +86,9 @@ def setup_packages():
 def setup_notebook_configs():
     """Generate Notebook server and supervisord config files and paths"""
     # generate an appropriate common_settings file
-    jinja_env = Environment(loader=FileSystemLoader(os.path.curdir))
-    template = jinja_env.get_template('common_settings.jinjia.py')
+    template_dir = os.path.join(os.path.curdir, 'templates')
+    jinja_env = Environment(loader=FileSystemLoader(template_dir))
+    template = jinja_env.get_template('common_settings.jinja.py')
     template_vars = {"host": env.hosts[0], 
                     "venv_bin_path": os.path.join(env.venv_path, 'bin'), 
                     "nbserver_id_start": env.nbserver_id_start,
@@ -113,8 +117,9 @@ def setup_notebook_configs():
 
 def setup_supervisord():
     """ Uploads supervisord config file """
-    jinja_env = Environment(loader=FileSystemLoader(os.path.curdir))
-    template = jinja_env.get_template('supervisord.jinjia.conf')
+    template_dir = os.path.join(os.path.curdir, 'templates')
+    jinja_env = Environment(loader=FileSystemLoader(template_dir))
+    template = jinja_env.get_template('supervisord.jinja.conf')
     template_vars = {"supervisord_server_addr": env.supervisord_server_addr, 
                     "supervisord_admin_username": env.supervisord_admin_username, 
                     "supervisord_admin_password": env.supervisord_admin_password,
@@ -139,6 +144,72 @@ def run_supervisord():
 
 ###  SETUP DJANGO APP ###################
 
+def setup_app_config():
+    # upload django local_settings file
+    template_dir = os.path.join(os.path.curdir, 'templates')
+    jinja_env = Environment(loader=FileSystemLoader(template_dir))
+    template = jinja_env.get_template('local_settings.jinja.py')
+    template_vars = {"ldap_host": env.ldap_host, 
+                    "ldap_bind_dn": env.ldap_bind_dn, 
+                    "ldap_bind_password": env.ldap_bind_password,
+                    "ldap_search_param" : env.ldap_search_param,
+                    "mysql_user": env.mysql_user,
+                    "mysql_dbname": env.mysql_dbname,
+                    "mysql_password": env.mysql_password
+                    }
+    output_from_parsed_template = template.render(template_vars)
+    local_path = '/tmp/local_settings.py'
+    with open(local_path, "wb") as fh:
+        fh.write(output_from_parsed_template)
+    put(local_path=local_path, remote_path=os.path.join(env.app_path, 'ipysite'))
+    
+    
+    ## upload wsgi.py
+    template = jinja_env.get_template('wsgi.jinja.py')
+    template_vars = {"python_local_site_packages": os.path.join(env.venv_path, 'local/lib/python2.7/site-packages'), 
+                    "app_path": env.app_path, 
+                    "venv_path": env.venv_path
+                    }
+    output_from_parsed_template = template.render(template_vars)
+    local_path = '/tmp/wsgi.py'
+    with open(local_path, "wb") as fh:
+        fh.write(output_from_parsed_template)
+    put(local_path=local_path, remote_path=os.path.join(env.app_path, 'ipysite'))
+
+def setup_app():
+    # syncdb
+    with virtualenv():
+        run("python %s/manage.py syncdb" %env.app_path)
 
 
+
+    
+
+def setup_apache_config():
+    ## upload Apache vhost config
+    template_dir = os.path.join(os.path.curdir, 'templates')
+    jinja_env = Environment(loader=FileSystemLoader(template_dir))
+    template_vars = {"server_name": env.server_name, 
+                    "app_path": env.app_path, 
+                    "venv_path": env.venv_path,
+                    "apache_user": env.apache_user,
+                    "apache_group": env.apache_group,
+                    "apache_process_count": env.apache_process_count,
+                    "apache_thread_count": env.apache_thread_count,
+                    }
+    if env.os == 'Debian':
+        template = jinja_env.get_template('wsgi_vhost_debian.jinja.py')
+    elif env.os == 'Redhat':
+        template = jinja_env.get_template('wsgi_vhost_redhat.jinja.py')
+        
+    output_from_parsed_template = template.render(template_vars)
+    local_path = '/tmp/wsgi_vhsot.conf'
+    with open(local_path, "wb") as fh:
+        fh.write(output_from_parsed_template)
+    
+    if env.os == 'Debian':
+        put(local_path=local_path, remote_path='/etc/apache2/sites-enabled')
+    elif env.os == 'Redhat':
+        put(local_path=local_path, remote_path='/etc/httpd/conf.d')
+    
 
