@@ -2,6 +2,7 @@
 common_settings.py
 local_settings.py
 notebook_config.py
+wsgi.py
 *.project
 *.pydevproject
 *.csv

@@ -200,6 +200,16 @@ def setup_app_config():
     put(local_path=local_path, remote_path=os.path.join(env.app_path, 'ipysite'))
     
     #upload notebook_config.py
+    template = jinja_env.get_template('notebook_config.jinja.py')
+    template_vars = {"base_url": env.base_url,
+                    "nbserver_settings_file": os.path.join(env.site_root_path, SHARED_CONFIG_DIR, SHARED_CONFIG_FILE), # access OK 
+                    "nbserver_access_config_files": os.path.join(env.app_path, 'ipysite', 'site_media', 'media'), # access OK 
+                    }
+    output_from_parsed_template = template.render(template_vars)
+    local_path = '/tmp/notebook_config.py'
+    with open(local_path, "wb") as fh:
+        fh.write(output_from_parsed_template)
+    put(local_path=local_path, remote_path=os.path.join(env.app_path, 'ipysite'))
     
 
 def setup_app():
