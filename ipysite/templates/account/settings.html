@@ -14,7 +14,7 @@
      <h4> 1. Copy your Notebook server  password: </h4> <p>Click the button below to copy the password into your sytem clipboard (if your browser doesn't have the Flash plug-in installed, use your mouse).  </p>
          <p><input id="clipfield" value={{ nbserver_password }}> {% clippy "clipfield" %}
      
-      <h4> 2. Vist your Notebook server URL: <a href="/run-notebook-server/">{{ nbserver_url }} </a></h4>
+      <h4> 2. Vist your Notebook server URL: <a href="{{ nbserver_url }}">{{ nbserver_url }} </a></h4>
 	     <p> On that page, paste the password in the input box and click login. Then enjoy working on your IPython notebooks!  </p>
       <h4> 3. Remember to log out! </h4>
 	     <p> When you finish working, always log out from your Notebook server by clicking the logout button on the top of your  Notebook server's landing page. Also don't forget to log out from the <a href="/">homepage</a>.
