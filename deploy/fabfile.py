@@ -115,7 +115,7 @@ def setup_notebook_configs():
                     "venv_bin_path": os.path.join(env.venv_path, 'bin'), 
                     "nbserver_id_start": env.nbserver_id_start,
                     "nbserver_id_end" : env.nbserver_id_end,
-                    "nbserver_port_base": env.nbserver_post_base,
+                    "nbserver_port_base": env.nbserver_port_base,
                     "initial_data_dir": os.path.join(env.site_root_path, INITIAL_DATA_DIR),
                     "user_data_dir": os.path.join(env.site_root_path, USER_DATA_DIR),
                     "supervisord_root_dir": os.path.join(env.site_root_path, SUPERVISORD_DIR),
@@ -198,6 +198,9 @@ def setup_app_config():
     with open(local_path, "wb") as fh:
         fh.write(output_from_parsed_template)
     put(local_path=local_path, remote_path=os.path.join(env.app_path, 'ipysite'))
+    
+    #upload notebook_config.py
+    
 
 def setup_app():
     # syncdb
@@ -223,7 +226,7 @@ def setup_apache_config():
         template = jinja_env.get_template('wsgi_vhost_redhat.jinja.conf')
         
     output_from_parsed_template = template.render(template_vars)
-    local_path = '/tmp/wsgi_vhsot.conf'
+    local_path = '/tmp/mod_wsgi.conf'
     with open(local_path, "wb") as fh:
         fh.write(output_from_parsed_template)
     
@@ -234,4 +237,4 @@ def setup_apache_config():
     
 
 def restart_apache():
-    sudo("%s restart" %env.apache_restart_cmd)
+    sudo("%s" %env.apache_restart_cmd)

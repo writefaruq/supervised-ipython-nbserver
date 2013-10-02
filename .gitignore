@@ -1,5 +1,7 @@
 *.pyc
+common_settings.py
 local_settings.py
+notebook_config.py
 *.project
 *.pydevproject
 *.csv
