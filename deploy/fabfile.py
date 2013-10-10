@@ -178,6 +178,7 @@ def setup_app_config():
                     "mysql_user": env.mysql_user,
                     "mysql_dbname": env.mysql_dbname,
                     "mysql_password": env.mysql_password,
+                    "mysql_sock": env.mysql_sock,
                     "debug": env.debug
                     }
     output_from_parsed_template = template.render(template_vars)
@@ -211,11 +212,35 @@ def setup_app_config():
         fh.write(output_from_parsed_template)
     put(local_path=local_path, remote_path=os.path.join(env.app_path, 'ipysite'))
     
+def setup_nbserver_config():
+    """ Uploads a config file for each notebook server"""
+    template_dir = os.path.join(os.path.curdir, 'templates')
+    jinja_env = Environment(loader=FileSystemLoader(template_dir))
+    template = jinja_env.get_template('ipython_config.jinja.py')
+    for nbserver_id in xrange(env.nbserver_id_start, env.nbserver_id_end):
+        ipython_dir = os.path.join(env.site_root_path, USER_DATA_DIR, 'notebook-server-%s' %nbserver_id)
+        template_vars = {"ipython_dir": ipython_dir,  
+                         "notebook_dir": os.path.join(ipython_dir, 'notebooks'), 
+                        }
+        output_from_parsed_template = template.render(template_vars)
+        local_path = '/tmp/ipython_config.py'
+        with open(local_path, "wb") as fh:
+            fh.write(output_from_parsed_template)
+        put(local_path=local_path, remote_path=os.path.join(ipython_dir, 'profile_default'))
+    
+        
+
+
 
 def setup_app():
     # syncdb
     with virtualenv():
         run("python %s/manage.py syncdb" %env.app_path)
+
+def reset_app_admin_pass():
+    with virtualenv():
+        run("python %s/manage.py changepassword nbadmin" %env.app_path)
+
 
 
 def setup_apache_config():
@@ -237,13 +262,16 @@ def setup_apache_config():
         
     output_from_parsed_template = template.render(template_vars)
     local_path = '/tmp/mod_wsgi.conf'
+    remote_path = '/etc/httpd/conf.d/mod_wsgi.conf'
     with open(local_path, "wb") as fh:
         fh.write(output_from_parsed_template)
     
     if env.os == 'Debian':
         put(local_path=local_path, remote_path='/etc/apache2/sites-enabled')
     elif env.os == 'Redhat':
-        put(local_path=local_path, remote_path='/etc/httpd/conf.d')
+        put(local_path=local_path, remote_path='/tmp')
+        #run("scp %s %s@%s:%s"  %(local_path, env.user, env.hosts[0], '/tmp'))
+        run("cp %s %s" %(local_path, remote_path))
     
 
 def restart_apache():

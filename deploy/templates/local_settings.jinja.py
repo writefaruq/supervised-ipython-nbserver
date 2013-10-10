@@ -35,7 +35,7 @@ AUTH_LDAP_USER_ATTR_MAP = {
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'HOST': '{{ myql_sock }}',
+        'HOST': '{{ mysql_sock }}',
         'NAME' : '{{ mysql_dbname }}',
         'USER' : '{{ mysql_user }}',
         'PASSWORD' : '{{ mysql_password }}',
