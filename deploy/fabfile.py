@@ -213,12 +213,18 @@ def setup_app_config():
     put(local_path=local_path, remote_path=os.path.join(env.app_path, 'ipysite'))
     
 def setup_nbserver_config():
-    """ Uploads a config file for each notebook server"""
+    """ Uploads a config file for each notebook server
+    
+    MUST RUN AFTER THE SUPERVISORD LAUNCHES ONCE WITH ALL NBSERVERS
+    
+    """
     template_dir = os.path.join(os.path.curdir, 'templates')
     jinja_env = Environment(loader=FileSystemLoader(template_dir))
     template = jinja_env.get_template('ipython_config.jinja.py')
     for nbserver_id in xrange(env.nbserver_id_start, env.nbserver_id_end):
         ipython_dir = os.path.join(env.site_root_path, USER_DATA_DIR, 'notebook-server-%s' %nbserver_id)
+        #run("rm -rf %s" %os.path.join(ipython_dir, 'profile_default'))
+        
         template_vars = {"ipython_dir": ipython_dir,  
                          "notebook_dir": os.path.join(ipython_dir, 'notebooks'), 
                         }
@@ -227,7 +233,7 @@ def setup_nbserver_config():
         with open(local_path, "wb") as fh:
             fh.write(output_from_parsed_template)
         put(local_path=local_path, remote_path=os.path.join(ipython_dir, 'profile_default'))
-    
+        
         
 
 
