@@ -10,7 +10,9 @@ from contextlib import contextmanager
 from jinja2 import Environment, FileSystemLoader
 
 # external utils functions
+import db_utils
 from db_utils import *
+
 
 
 # Relateive paths
@@ -179,7 +181,8 @@ def setup_app_config():
                     "mysql_dbname": env.mysql_dbname,
                     "mysql_password": env.mysql_password,
                     "mysql_sock": env.mysql_sock,
-                    "debug": env.debug
+                    "debug": env.debug,
+                    "logfile": "/tmp/app.log"
                     }
     output_from_parsed_template = template.render(template_vars)
     local_path = '/tmp/local_settings.py'
@@ -277,8 +280,30 @@ def setup_apache_config():
     elif env.os == 'Redhat':
         put(local_path=local_path, remote_path='/tmp')
         #run("scp %s %s@%s:%s"  %(local_path, env.user, env.hosts[0], '/tmp'))
-        run("cp %s %s" %(local_path, remote_path))
+        #run("cp %s %s" %(local_path, remote_path)) ## Request to copy
     
 
 def restart_apache():
-    sudo("%s" %env.apache_restart_cmd)
+    run("%s" %env.apache_restart_cmd)
+
+def update_config():
+    """ Update local_settings and restart apache"""
+    setup_app_config()
+    restart_apache()
+
+def deploy_all():
+    """ Run all steps"""
+    setup_paths()
+    setup_virtualenv()
+    setup_packages()
+    setup_notebook_configs()
+    setup_supervisord()
+    run_supervisord()
+    setup_app_config()
+    db_utils.empty_db() # enter: ipython_live 
+    setup_app()
+    setup_apache_config()
+    setup_nbserver_config()
+    restart_apache() 
+    
+    
