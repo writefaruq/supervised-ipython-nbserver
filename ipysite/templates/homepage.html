@@ -31,6 +31,6 @@
     {% else %}
         {% url account_login as login_url %}
         {% url account_signup as signup_url %}
-        <p>{% blocktrans %}You can <a href="{{ login_url }}" class="btn">Log In</a>  to try out the Ipython Notebook Server.{% endblocktrans %}</p>
+        <p>{% blocktrans %}You can <a href="/account/login/" class="btn">Log In</a>  to try out the Ipython Notebook Server.{% endblocktrans %}</p>
     {% endif %}
 {% endblock %}
