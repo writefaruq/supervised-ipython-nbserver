@@ -10,7 +10,9 @@ from contextlib import contextmanager
 from jinja2 import Environment, FileSystemLoader
 
 # external utils functions
+import db_utils
 from db_utils import *
+
 
 
 # Relateive paths
@@ -178,7 +180,9 @@ def setup_app_config():
                     "mysql_user": env.mysql_user,
                     "mysql_dbname": env.mysql_dbname,
                     "mysql_password": env.mysql_password,
-                    "debug": env.debug
+                    "mysql_sock": env.mysql_sock,
+                    "debug": env.debug,
+                    "logfile": "/tmp/app.log"
                     }
     output_from_parsed_template = template.render(template_vars)
     local_path = '/tmp/local_settings.py'
@@ -211,11 +215,41 @@ def setup_app_config():
         fh.write(output_from_parsed_template)
     put(local_path=local_path, remote_path=os.path.join(env.app_path, 'ipysite'))
     
+def setup_nbserver_config():
+    """ Uploads a config file for each notebook server
+    
+    MUST RUN AFTER THE SUPERVISORD LAUNCHES ONCE WITH ALL NBSERVERS
+    
+    """
+    template_dir = os.path.join(os.path.curdir, 'templates')
+    jinja_env = Environment(loader=FileSystemLoader(template_dir))
+    template = jinja_env.get_template('ipython_config.jinja.py')
+    for nbserver_id in xrange(env.nbserver_id_start, env.nbserver_id_end):
+        ipython_dir = os.path.join(env.site_root_path, USER_DATA_DIR, 'notebook-server-%s' %nbserver_id)
+        #run("rm -rf %s" %os.path.join(ipython_dir, 'profile_default'))
+        
+        template_vars = {"ipython_dir": ipython_dir,  
+                         "notebook_dir": os.path.join(ipython_dir, 'notebooks'), 
+                        }
+        output_from_parsed_template = template.render(template_vars)
+        local_path = '/tmp/ipython_config.py'
+        with open(local_path, "wb") as fh:
+            fh.write(output_from_parsed_template)
+        put(local_path=local_path, remote_path=os.path.join(ipython_dir, 'profile_default'))
+        
+        
+
+
 
 def setup_app():
     # syncdb
     with virtualenv():
         run("python %s/manage.py syncdb" %env.app_path)
+
+def reset_app_admin_pass():
+    with virtualenv():
+        run("python %s/manage.py changepassword nbadmin" %env.app_path)
+
 
 
 def setup_apache_config():
@@ -237,14 +271,39 @@ def setup_apache_config():
         
     output_from_parsed_template = template.render(template_vars)
     local_path = '/tmp/mod_wsgi.conf'
+    remote_path = '/etc/httpd/conf.d/mod_wsgi.conf'
     with open(local_path, "wb") as fh:
         fh.write(output_from_parsed_template)
     
     if env.os == 'Debian':
         put(local_path=local_path, remote_path='/etc/apache2/sites-enabled')
     elif env.os == 'Redhat':
-        put(local_path=local_path, remote_path='/etc/httpd/conf.d')
+        put(local_path=local_path, remote_path='/tmp')
+        #run("scp %s %s@%s:%s"  %(local_path, env.user, env.hosts[0], '/tmp'))
+        #run("cp %s %s" %(local_path, remote_path)) ## Request to copy
     
 
 def restart_apache():
-    sudo("%s" %env.apache_restart_cmd)
+    run("%s" %env.apache_restart_cmd)
+
+def update_config():
+    """ Update local_settings and restart apache"""
+    setup_app_config()
+    restart_apache()
+
+def deploy_all():
+    """ Run all steps"""
+    setup_paths()
+    setup_virtualenv()
+    setup_packages()
+    setup_notebook_configs()
+    setup_supervisord()
+    run_supervisord()
+    setup_app_config()
+    db_utils.empty_db() # enter: ipython_live 
+    setup_app()
+    setup_apache_config()
+    setup_nbserver_config()
+    restart_apache() 
+    
+    
